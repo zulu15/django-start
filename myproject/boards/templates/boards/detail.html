@@ -1,6 +1,12 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'boards/bootstrap-4.4.1/css/bootstrap.min.css' %}">
+<div class="container">	
 <h1>{{ question.question_text }}</h1>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% if error_message %}<div class="alert alert-danger" role="alert">
+  {{ error_message }}
+</div>  {% endif %}
 
 <form action="{% url 'vote' question.id %}" method="post">
 {% csrf_token %}
@@ -8,5 +14,6 @@
     <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
     <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
 {% endfor %}
-<input type="submit" value="Vote">
+<input class="btn btn-primary" type="submit" value="Vote">
 </form>
+</div>

@@ -1,26 +1,28 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from boards.models import Question, Choice
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views import generic
 
 
-def index(request):
-    ultimas_preguntas = Question.objects.order_by('-pub_date')[:5]
-    context = {
-        'ultimas_preguntas_list': ultimas_preguntas,
-    }
-    return render(request,'boards/index.html',context)
+class IndexView(generic.ListView):
+    template_name = 'boards/index.html'
+    context_object_name = 'ultimas_preguntas_list'
+
+    def get_queryset(self):
+        return Question.objects.order_by('-pub_date')[:5]
 
 
-def detail(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request,"boards/detail.html",{"question":question})
 
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request,"boards/results.html",{"question":question})
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'boards/detail.html'
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = 'boards/results.html'
 
 
 def vote(request, question_id):
@@ -40,7 +42,7 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         
-    return HttpResponseRedirect(reverse('results', args=(question.id,)))  
+    return HttpResponseRedirect(reverse('results',args= (question.id,) ))  
 
 
 

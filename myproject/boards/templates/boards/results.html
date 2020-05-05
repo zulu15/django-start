@@ -1,3 +1,8 @@
+{% load static %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'boards/bootstrap-4.4.1/css/bootstrap.min.css' %}">
+<div class="container">
 <h1>{{ question.question_text }}</h1>
 
 <ul>
@@ -6,4 +11,5 @@
 {% endfor %}
 </ul>
 
-<a href="{% url 'detail' question.id %}">Vote again?</a>
+<a class="btn btn-primary" href="{% url 'detail' question.id %}">Vote again?</a>
+</div>
