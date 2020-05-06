@@ -2,14 +2,36 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'boards/bootstrap-4.4.1/css/bootstrap.min.css' %}">
 <div class="container">
+
+{% if user.is_authenticated %}
+<div>
+  Bienvenido <strong>{{ user.username }}!</strong>  <a class="text-right" href="{% url 'logout' %}">Salir</a>
+  <p class="text-right"><a href="{% url 'create' %}">Crear pregunta</a></p>
+  
+  </div>
+
+{% else %}
+  <p>No has iniciado sesión</p>
+  <a href="{% url 'login' %}">Iniciar sesión</a> /
+  <a href="{% url 'signup' %}">Registrarse</a>
+{% endif %}
+
 {% if ultimas_preguntas_list %}
     {% for question in ultimas_preguntas_list %}
-    <div class="card" >
+    <div>
     	<div class="row">
-		  <div class="col-sm-12">
+		  <div class="offset-md-3 col-md-6	">
 		    <div class="card">
 		      <div class="card-body">
 		        <h5 class="card-title text-center">{{ question.question_text }}</h5>
+		        {% if question.choice_set.all %}
+		        <ul>
+		         {% for choice in question.choice_set.all %}
+		         	<li>{{ choice.choice_text }} {{ choice.votes_as_percentage }}%</li>
+ 				 {% endfor %}
+ 				 </ul>
+ 				{% endif %}
+
 		        <p class="card-text text-center">Encuesta publicada el: {{ question.pub_date }}</p>
 		        <div class="text-center"><a href="/boards/{{ question.id }}/" class="btn btn-primary ">Votar!	</a>
 		        </div>		        

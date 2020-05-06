@@ -10,7 +10,7 @@ import datetime
 class Question(models.Model):
 
     question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField('date published', blank=True)
 
     def __str__(self):
         return self.question_text
@@ -18,6 +18,10 @@ class Question(models.Model):
     def was_published_recently(self):
         return self.pub_date <= timezone.now()  - datetime.timedelta(days=1)
 
+    def total_votes(self):
+        return sum(p.votes for p in self.choice_set.all())
+
+        
 
 class Choice(models.Model):
 
@@ -27,6 +31,9 @@ class Choice(models.Model):
     #random = models.IntegerField(default=0)
     def __str__(self):
         return self.choice_text
+
+    def votes_as_percentage(self):
+        return "{:.2f}".format((self.votes / self.question.total_votes()) * 100) if self.votes else 0;
 
 
 

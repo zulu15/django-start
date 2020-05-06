@@ -1,0 +1,30 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'boards/bootstrap-4.4.1/css/bootstrap.min.css' %}">
+<div class="container">
+
+{% if user.is_authenticated %}
+
+<form method="post">
+	{% csrf_token %}
+    {{ pollForm.as_p }}
+ 	 <table>
+        {{ formset }}
+    </table>
+ 
+
+	<button class="btn btn-primary" type="submit">Crear</button>
+</form>
+
+{% else %}
+  <p>No has iniciado sesión</p>
+  <a href="{% url 'login' %}">Iniciar sesión</a> /
+  <a href="{% url 'signup' %}">Registrarse</a>
+{% endif %}
+
+
+
+</div>
+
+
+

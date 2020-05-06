@@ -5,7 +5,9 @@ from boards.models import Question, Choice
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
-
+from boards.forms import PollForm, ChoiceForm
+from django.utils import timezone
+from django.forms import formset_factory
 
 class IndexView(generic.ListView):
     template_name = 'boards/index.html'
@@ -14,6 +16,30 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return Question.objects.order_by('-pub_date')[:5]
 
+
+
+def create_poll(request):
+    ChoiceFormSet = formset_factory(ChoiceForm, extra=2)
+
+    if request.method == 'POST':
+
+        pollForm = PollForm(request.POST)
+        formset = ChoiceFormSet(request.POST, request.FILES)
+
+        if pollForm.is_valid() and formset.is_valid():
+            question = pollForm.save(commit=False) 
+            question.pub_date = timezone.now()
+            question.save()  
+            for form in formset.forms:
+                choice = form.save(commit=False)
+                question.choice_set.create(choice_text=choice.choice_text, votes=0)
+        return HttpResponseRedirect(reverse('index'))  
+    else:
+        pollForm = PollForm()   
+        choiceFormSet = ChoiceFormSet()
+        return render(request, 'boards/create_poll.html', {'pollForm':pollForm, 'formset': ChoiceFormSet})
+
+            
 
 
 class DetailView(generic.DetailView):
@@ -44,7 +70,3 @@ def vote(request, question_id):
         
     return HttpResponseRedirect(reverse('results',args= (question.id,) ))  
 
-
-
-			
-			
