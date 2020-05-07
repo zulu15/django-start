@@ -2,6 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from .models import Question,Choice
+from django.contrib.auth.models import User
 
 
 class ChoiceInline(admin.TabularInline):
@@ -9,9 +10,11 @@ class ChoiceInline(admin.TabularInline):
     extra = 3
 
 
+
 class QuestionAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,               {'fields': ['question_text']}),
+        ('Usuario',           {'fields': ['author']}),
         ('Date information', {'fields': ['pub_date']}),
     ]
 

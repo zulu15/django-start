@@ -3,7 +3,7 @@
 from django.http import HttpResponseRedirect
 from boards.models import Question, Choice
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 from boards.forms import PollForm, ChoiceForm
 from django.utils import timezone
@@ -28,11 +28,14 @@ def create_poll(request):
 
         if pollForm.is_valid() and formset.is_valid():
             question = pollForm.save(commit=False) 
-            question.pub_date = timezone.now()
-            question.save()  
-            for form in formset.forms:
-                choice = form.save(commit=False)
-                question.choice_set.create(choice_text=choice.choice_text, votes=0)
+            user =  request.user
+            if user is not None:
+                question.author = user
+                question.pub_date = timezone.now()
+                question.save()  
+                for form in formset.forms:
+                    choice = form.save(commit=False)
+                    question.choice_set.create(choice_text=choice.choice_text, votes=0)
         return HttpResponseRedirect(reverse('index'))  
     else:
         pollForm = PollForm()   
@@ -41,8 +44,30 @@ def create_poll(request):
 
             
 
+class DeletePollView(generic.DeleteView):
+    model = Question
+    #template_name = 'boards/poll_confirm_delete.html'
+    #success_url = reverse('index')
+
+    def delete(self, request, *args, **kwargs):
+       self.object = self.get_object()
+       if self.object.author == request.user:
+          self.object.delete()
+          return HttpResponseRedirect(self.get_success_url())
+       else:
+
+            return HttpResponseRedirect(reverse('index'))  
+
+            #or return HttpResponse('404_url')    
+
+    def get_success_url(self):
+        return reverse('index')
+
+    
+
 
 class DetailView(generic.DetailView):
+    # pollForm = PollForm()   
     model = Question
     template_name = 'boards/detail.html'
 
@@ -52,21 +77,22 @@ class ResultsView(generic.DetailView):
 
 
 def vote(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
-    except (KeyError, Choice.DoesNotExist):
-        # Redisplay the question voting form.
-        return render(request, 'boards/detail.html', {
-            'question': question,
-            'error_message': "You didn't select a choice.",
-        })
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        
-    return HttpResponseRedirect(reverse('results',args= (question.id,) ))  
+    if request.method == 'POST':
+        question = get_object_or_404(Question, pk=question_id)
+        try:
+            selected_choice = question.choice_set.get(pk=request.POST['choice'])
+        except (KeyError, Choice.DoesNotExist):
+            # Redisplay the question voting form.
+            #request.session['error'] = "Debes seleccionar una opción!"
+            return HttpResponseRedirect(reverse('index'))  
 
+        else:
+            selected_choice.votes += 1
+            selected_choice.save()
+            # Always return an HttpResponseRedirect after successfully dealing
+            # with POST data. This prevents data from being posted twice if a
+            # user hits the Back button.
+        
+        return HttpResponseRedirect(reverse('index'))  
+    else:
+        return HttpResponseRedirect(reverse('index'))  

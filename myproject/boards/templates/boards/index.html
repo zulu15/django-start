@@ -2,11 +2,15 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'boards/bootstrap-4.4.1/css/bootstrap.min.css' %}">
 <div class="container">
-
+<script src="{% static 'boards/js/jquery-3.5.1.min.js' %}"></script>
+<script src="{% static 'boards/bootstrap-4.4.1/js/bootstrap.min.js' %}"></script>
 {% if user.is_authenticated %}
 <div>
   Bienvenido <strong>{{ user.username }}!</strong>  <a class="text-right" href="{% url 'logout' %}">Salir</a>
-  <p class="text-right"><a href="{% url 'create' %}">Crear pregunta</a></p>
+  <p class="text-right">
+  	<button class="text-right btn btn-primary" onclick="abrir_modal_crear_poll('{% url 'create' %}')">Crear pregunta</button>
+  	
+  </p>
   
   </div>
 
@@ -15,6 +19,17 @@
   <a href="{% url 'login' %}">Iniciar sesión</a> /
   <a href="{% url 'signup' %}">Registrarse</a>
 {% endif %}
+
+
+{% if request.session.error %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+   {{request.session.error}}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif %}
+
 
 {% if ultimas_preguntas_list %}
     {% for question in ultimas_preguntas_list %}
@@ -31,10 +46,17 @@
  				 {% endfor %}
  				 </ul>
  				{% endif %}
+				<p class="card-text text-center text-info">Encuesta publicada el: {{ question.pub_date }} por <strong>{{ question.author }}</strong> </p>
+				{% if user.is_authenticated %}
 
-		        <p class="card-text text-center">Encuesta publicada el: {{ question.pub_date }}</p>
-		        <div class="text-center"><a href="/boards/{{ question.id }}/" class="btn btn-primary ">Votar!	</a>
-		        </div>		        
+		        <div class="text-center">
+		        <button class="btn btn-primary" onclick="abrir_modal_vote_poll('{% url 'detail' question.id %}')">Votar!</button>	
+		        {% if question.author.id == user.id %}
+				<button class="btn btn-danger" onclick="abrir_modal_eliminar_poll('{% url 'delete' question.id %}')">Eliminar</button>
+				{% endif %}
+		        </div>		
+		 		{% endif %}
+        
 		      </div>
 		    </div>
 		  </div>	 
@@ -55,3 +77,35 @@
 <p class="text-muted text-center">	<b>Polls count: {{ ultimas_preguntas_list.count }} </b></p>
 
 </div>
+
+<div class="modal fade" id="create_poll_modal">
+</div>
+<div class="modal fade" id="delete_poll_modal">
+</div>
+<div class="modal fade" id="vote_poll_modal">
+</div>
+
+<script type="text/javascript">
+	function abrir_modal_crear_poll(url){
+		$(".alert").alert('close')
+
+		$("#create_poll_modal").load(url, function(){
+			$(this).modal("show");
+		});
+	}
+
+	function abrir_modal_eliminar_poll(url){
+	$(".alert").alert('close')
+
+	$("#delete_poll_modal").load(url, function(){
+			$(this).modal("show");
+		});	
+	}
+	function abrir_modal_vote_poll(url){
+		$(".alert").alert('close')
+
+		$("#vote_poll_modal").load(url, function(){
+				$(this).modal("show");
+			});	
+		}
+</script>

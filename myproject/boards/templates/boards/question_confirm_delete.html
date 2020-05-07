@@ -1,22 +1,22 @@
 <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Crear pregunta</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Eliminar pregunta</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-       <form method="post" action="{% url 'create' %}">
+       <form method="post" action="{% url 'delete' question.id %}">
 		{% csrf_token %}
-	    {{ pollForm.as_p }}
-	 	{{ formset }}
+	    
+	 	   <p>¿Está seguro que desea eliminar {{object}}?</p>
 	    <div style="margin-top: 2%">
-	    	<button class="btn btn-primary" type="submit">Crear</button>
-		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-	    </div>
+	    	<button class="btn btn-danger" type="submit">Eliminar</button>
 		
-	</form>
+	     </div>
+		
+	     </form>
 
       </div>
 

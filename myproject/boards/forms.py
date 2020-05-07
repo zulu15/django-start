@@ -28,7 +28,7 @@ class ChoiceForm(forms.ModelForm):
 
 		]
 
-		labels = { 'choice_text': 'Respuesta'}
+		labels = { 'choice_text': 'Opción'}
 		widgets = {
 			'choice_text': forms.TextInput(attrs={'class':'form-control'}),
 		}

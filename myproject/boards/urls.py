@@ -9,6 +9,6 @@ urlpatterns = [
     path('<int:question_id>/vote/', views.vote, name='vote'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('create_poll/', views.create_poll, name='create'),
-
+	path('<int:pk>/delete/', views.DeletePollView.as_view(), name='delete'),
 
 ]
