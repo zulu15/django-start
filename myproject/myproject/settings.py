@@ -124,3 +124,4 @@ USE_TZ = False
 STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = '/boards/'
 LOGOUT_REDIRECT_URL = '/boards/'
+

@@ -1,10 +1,33 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'boards/bootstrap-4.4.1/css/bootstrap.min.css' %}">
 <div class="container">
- <h2>Sign up</h2>
+ <h2>Registrarse</h2>
   <form method="post" class="form-group">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-primary" type="submit">Sign up</button>
-  </form>
+  	{% csrf_token %}
+  <div class="form-group">
+    <label for="username">Nombre de usuario</label>
+    <input type="text" class="form-control" name="username" placeholder="Ingrese su nombre de usuario">
   </div>
+   <div class="form-group">
+    <label for="password">Contraseña</label>
+    <input type="password" class="form-control" name="password1" placeholder="Ingrese su contraseña">
+  </div>
+   <div class="form-group">
+    <label for="password">Repita su Contraseña:</label>
+    <input type="password" class="form-control" name="password2" placeholder="Ingrese su contraseña">
+  </div>
+   <button class="btn btn-primary" type="submit">Registrarse</button>
+
+</form>
+
+{% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                <div class="alert alert-danger" role="alert">
+  				     {{field.label}}: {{ error|escape }}
+				</div>
+                {% endfor %}
+            {% endfor %}
+     
+{% endif %}
+</div>

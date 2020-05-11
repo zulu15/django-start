@@ -3,11 +3,13 @@ from boards.models import Question, Choice
 
 class PollForm(forms.ModelForm):
 
+	#choice_list = forms.ModelChoiceField(Choice.objects.all())
 	class Meta:
 		model = Question
 
 		fields = [
 		 'question_text',
+		 #'choice_list'
 
 		]
 
@@ -15,6 +17,7 @@ class PollForm(forms.ModelForm):
 		widgets = {
 			'question_text': forms.TextInput(attrs={'class':'form-control'}),
 		}
+
 
 
 
@@ -32,3 +35,4 @@ class ChoiceForm(forms.ModelForm):
 		widgets = {
 			'choice_text': forms.TextInput(attrs={'class':'form-control'}),
 		}
+

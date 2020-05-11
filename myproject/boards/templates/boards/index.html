@@ -4,6 +4,9 @@
 <div class="container">
 <script src="{% static 'boards/js/jquery-3.5.1.min.js' %}"></script>
 <script src="{% static 'boards/bootstrap-4.4.1/js/bootstrap.min.js' %}"></script>
+
+
+
 {% if user.is_authenticated %}
 <div>
   Bienvenido <strong>{{ user.username }}!</strong>  <a class="text-right" href="{% url 'logout' %}">Salir</a>
@@ -21,15 +24,16 @@
 {% endif %}
 
 
-{% if request.session.error %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-   {{request.session.error}}
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">
+		{{ message }}
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
-  </button>
-</div>
+  </button>	
+	</div>
+    {% endfor %}
 {% endif %}
-
 
 {% if ultimas_preguntas_list %}
     {% for question in ultimas_preguntas_list %}
@@ -50,7 +54,7 @@
 				{% if user.is_authenticated %}
 
 		        <div class="text-center">
-		        <button class="btn btn-primary" onclick="abrir_modal_vote_poll('{% url 'detail' question.id %}')">Votar!</button>	
+		        <button class="btn btn-primary" onclick="abrir_modal_vote_poll('{% url 'vote' question.id %}')">Votar!</button>	
 		        {% if question.author.id == user.id %}
 				<button class="btn btn-danger" onclick="abrir_modal_eliminar_poll('{% url 'delete' question.id %}')">Eliminar</button>
 				{% endif %}
