@@ -7,7 +7,7 @@
         </button>
       </div>
       <div class="modal-body">
-       <form method="post" action="{% url 'create' %}">
+       <form method="post" action="{% url 'create' %}" enctype="multipart/form-data">
 		{% csrf_token %}
 	    {{ pollForm.as_p }}
 	 	{{ formset }}

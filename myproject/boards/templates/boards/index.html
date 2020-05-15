@@ -1,4 +1,5 @@
 {% load static %}
+{% load thumbnail %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'boards/bootstrap-4.4.1/css/bootstrap.min.css' %}">
 <div class="container">
@@ -42,19 +43,29 @@
 		  <div class="offset-md-3 col-md-6	">
 		    <div class="card">
 		      <div class="card-body">
-		        <h5 class="card-title text-center">{{ question.question_text }}</h5>
+
+		        <a class="card-title text-center h5" href="{% url 'detail' question.id %}">{{ question.question_text }}</a>
+		        <div class="text-center">
+		        {% thumbnail question.image "400x300" crop="center" as im %}
+    				<img class="thumbnail" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+				{% endthumbnail %}	
+		        </div>
 		        {% if question.choice_set.all %}
+
 		        <ul>
 		         {% for choice in question.choice_set.all %}
 		         	<li>{{ choice.choice_text }} {{ choice.votes_as_percentage }}%</li>
  				 {% endfor %}
  				 </ul>
  				{% endif %}
-				<p class="card-text text-center text-info">Encuesta publicada el: {{ question.pub_date }} por <strong>{{ question.author }}</strong> </p>
+				<p class="card-text text-center text-info">Publicado el: {{ question.pub_date }} por <strong>{{ question.author }}</strong> </p>
 				{% if user.is_authenticated %}
 
 		        <div class="text-center">
+		     	{% if question.choice_set.all %}
+	
 		        <button class="btn btn-primary" onclick="abrir_modal_vote_poll('{% url 'vote' question.id %}')">Votar!</button>	
+		        {% endif %}
 		        {% if question.author.id == user.id %}
 				<button class="btn btn-danger" onclick="abrir_modal_eliminar_poll('{% url 'delete' question.id %}')">Eliminar</button>
 				{% endif %}

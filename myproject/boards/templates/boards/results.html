@@ -1,15 +1,55 @@
 {% load static %}
+{% load thumbnail %}
 
 
 <link rel="stylesheet" type="text/css" href="{% static 'boards/bootstrap-4.4.1/css/bootstrap.min.css' %}">
 <div class="container">
-<h1>{{ question.question_text }}</h1>
+	<div class="row">
+		<div class="col-md-4" style="overflow:hidden;">
+				<p class="card-text text-center text-info">Publicado el: {{ question.pub_date }} por <strong>{{ question.author }}</strong> </p>
+			  {% thumbnail question.image "400x300" crop="center" as im %}
+    				<img class="thumbnail" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+				{% endthumbnail %}	
+		</div>
+		<div class="col-md-8">
+					<h2 class="text-center">{{ question.question_text }}</h1>
+				{% if question.choice_set.all %}
 
-<ul>
-{% for choice in question.choice_set.all %}
-    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
-{% endfor %}
-</ul>
+		        <ul>
+		         {% for choice in question.choice_set.all %}
+		         	<li>{{ choice.choice_text }} {{ choice.votes_as_percentage }}%</li>
+ 				 {% endfor %}
+ 				 </ul>
+ 				{% endif %}
+			
+		</div>
+	</div>
+	&nbsp;
+	<form method="post" action="{% url 'detail' question.id %}">
+		{% csrf_token %}		
+	    {{ form.as_p }}
+		<button type="submit">Comentar</button>
+	</form>
 
-<a class="btn btn-primary" href="{% url 'detail' question.id %}">Vote again?</a>
+
+	<h2>Total de Comentarios: {{question.comentario_set.all.count}}</h2>
+
+	<div class="container">
+	{% for comentario in question.comentario_set.all %}
+
+		<blockquote class="blockquote">
+	  		<p class="mb-0">{{comentario.comentario}}</p>
+	  		<footer class="blockquote-footer">Publicado por <cite title="Source Title">{{comentario.usuario.username}} a las {{comentario.pub_date}} </cite></footer>
+		</blockquote>
+
+		
+
+		<form method="post" action="{% url 'detail' question.id %}">
+		{% csrf_token %}		
+	    {{ form.as_p }}
+		<input type="hidden" name="question_id" value="{{question.id}}">		
+		<button type="submit">Comentar</button>
+		</form>
+	{% endfor %}
+	</div>
 </div>

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Question,Choice, Vote
+from .models import Question,Choice, Vote, Comentario
 from django.contrib.auth.models import User
 
 
@@ -29,3 +29,4 @@ class QuestionAdmin(admin.ModelAdmin):
 
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Vote)
+admin.site.register(Comentario)

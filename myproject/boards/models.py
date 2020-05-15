@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 import datetime
 from django.contrib.auth.models import User
+from sorl.thumbnail import ImageField
 
 
 # Create your models here.
@@ -13,7 +14,7 @@ class Question(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published', blank=True)
-
+    image = ImageField(blank = True  , null= True , default="none/no-img.jpeg")
 
     def __str__(self):
         return self.question_text
@@ -28,7 +29,7 @@ class Question(models.Model):
 
 class Choice(models.Model):
 
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE,  blank=True, null=True )
     choice_text = models.CharField(max_length=200)
     
     #random = models.IntegerField(default=0)
@@ -52,3 +53,17 @@ class Vote(models.Model):
 
     def __str__(self):
         return '{} / {} / {}'.format(self.choice.question.question_text, self.choice.choice_text ,self.usuario.username)
+
+
+
+class Comentario(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    pub_date = models.DateTimeField('date published', auto_now = False, auto_now_add = True)
+    comentario = models.CharField(max_length=200)
+    respuesta = models.ForeignKey("Comentario", null=True, blank=True,related_name="respuestas", on_delete=models.SET_NULL, default=None)
+
+    def __str__(self):
+        return self.comentario;
+
+

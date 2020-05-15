@@ -1,14 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from django.http import HttpResponseRedirect
-from boards.models import Question, Choice, Vote
+from boards.models import Question, Choice, Vote, Comentario
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.views import generic
-from boards.forms import PollForm, ChoiceForm
+from boards.forms import PollForm, ChoiceForm, ComentarioForm
 from django.utils import timezone
 from django.forms import formset_factory
 from django.contrib import messages
+
+
+
+
 
 class IndexView(generic.ListView):
     template_name = 'boards/index.html'
@@ -25,7 +29,7 @@ def create_poll(request):
 
     if request.method == 'POST':
 
-        pollForm = PollForm(request.POST)
+        pollForm = PollForm(request.POST, request.FILES)
         formset = ChoiceFormSet(request.POST, request.FILES)
 
         if pollForm.is_valid() and formset.is_valid():
@@ -37,7 +41,8 @@ def create_poll(request):
                 question.save()  
                 for form in formset.forms:
                     choice = form.save(commit=False)
-                    question.choice_set.create(choice_text=choice.choice_text)
+                    if len(choice.choice_text) > 0:   
+                        question.choice_set.create(choice_text=choice.choice_text)
         
         messages.success(request, 'Se añadió tu pregunta correctamente!')    
         return HttpResponseRedirect(reverse('index'))  
@@ -47,6 +52,11 @@ def create_poll(request):
         return render(request, 'boards/create_poll.html', {'pollForm':pollForm, 'formset': ChoiceFormSet})
 
             
+
+
+
+
+
 
 class DeletePollView(generic.DeleteView):
     model = Question
@@ -68,10 +78,30 @@ class DeletePollView(generic.DeleteView):
 
 
 
-class ResultsView(generic.DetailView):
+class DetailView(generic.DetailView):
     model = Question
     template_name = 'boards/results.html'
+    form_class = ComentarioForm
 
+
+   
+
+    def get_context_data(self, **kwargs):
+        context = super(DetailView, self).get_context_data(**kwargs)
+        if 'form' not in context:
+            context['form'] = self.form_class(self.request.GET)
+
+        return context;    
+
+    def post(self, request, *args, **kwargs ):
+        self.object = self.get_object
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            c = form.save(commit = False)
+            c.usuario = request.user
+            c.question = Question.objects.get(pk=kwargs.get('pk'))
+            c.save()
+            return HttpResponseRedirect(reverse_lazy('detail', kwargs = {'pk': kwargs.get('pk')}))
 
 def vote(request, question_id):
 
